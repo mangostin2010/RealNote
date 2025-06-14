@@ -8,4 +8,4 @@ AI-powered note-taking app with Markdown editor and integrated GPT-4.1 chat for 
 
 ### Notes
 - Used Pollinations API for GPT-4.1 integration.
-- Published URL is realnote.kro.kr[realnote.kro.kr]
+- Published URL is [realnote.kro.kr][realnote.kro.kr]
