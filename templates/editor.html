@@ -1,0 +1,1009 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>RealNote - {{ doc_id }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/simplemde/dist/simplemde.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css/github-markdown.min.css">
+    <style>
+        :root {
+            --bg-color: #f8f9fa;
+            --card-bg: white;
+            --text-color: #333;
+            --text-muted: #6c757d;
+            --border-color: #e1e1e1;
+            --primary-color: #3b5998;
+            --primary-hover: #2d4373;
+            --success-color: #2ecc71;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            font-family: 'Pretendard', 'Noto Sans KR', sans-serif;
+            padding-top: 20px;
+            padding-bottom: 100px;
+            color: var(--text-color);
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .container {
+            max-width: 1000px;
+            padding: 0 20px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border-color);
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .header h1 {
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 0;
+            font-size: 1.8rem;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .username {
+            font-weight: 600;
+            color: var(--text-color);
+            padding: 6px 12px;
+            background-color: rgba(59, 89, 152, 0.1);
+            border-radius: 15px;
+            font-size: 0.9rem;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            border: none;
+            border-radius: 8px;
+            font-weight: 500;
+            padding: 8px 16px;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .btn-outline-primary {
+            color: var(--primary-color);
+            border-color: var(--primary-color);
+            border-radius: 8px;
+            font-weight: 500;
+            padding: 8px 16px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-outline-primary:hover {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .editor-container {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            padding: 20px;
+            margin-bottom: 25px;
+            transition: background-color 0.3s ease;
+        }
+
+        .editor-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .editor-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: var(--text-color);
+            margin: 0;
+            word-break: break-word;
+        }
+
+        .editor-status {
+            color: var(--success-color);
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .editor-actions {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 15px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .action-btn {
+            display: flex;
+            align-items: center;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.9rem;
+            padding: 8px 12px;
+            border-radius: 6px;
+            transition: all 0.2s;
+            gap: 5px;
+        }
+
+        .action-btn:hover {
+            background-color: rgba(59, 89, 152, 0.1);
+            color: var(--primary-color);
+        }
+
+        .preview-container {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            padding: 20px;
+            margin-bottom: 25px;
+            transition: background-color 0.3s ease;
+        }
+
+        .preview-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .preview-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: var(--text-color);
+            margin: 0;
+        }
+
+        .markdown-body {
+            background: transparent !important;
+            color: var(--text-color) !important;
+            border: 1px solid var(--border-color);
+            padding: 20px;
+            border-radius: 8px;
+            min-height: 200px;
+            transition: border-color 0.3s ease;
+        }
+
+        /* 채팅 UI */
+        .chat-input-container {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: min(500px, calc(100vw - 40px));
+            background-color: var(--card-bg);
+            border-radius: 30px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            z-index: 1000;
+            display: flex;
+            padding: 10px 20px;
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+
+        .chat-input-container:focus-within {
+            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+            border-color: var(--primary-color);
+        }
+
+        .chat-input-container input {
+            flex: 1;
+            border: none;
+            outline: none;
+            padding: 5px 12px;
+            font-size: 16px;
+            background: transparent;
+            color: var(--text-color);
+        }
+
+        .chat-input-container input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .chat-input-container button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .chat-input-container button:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .chat-container {
+            position: fixed;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: min(600px, calc(100vw - 40px));
+            max-height: min(400px, calc(100vh - 200px));
+            background-color: var(--card-bg);
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            display: flex;
+            flex-direction: column;
+            z-index: 1000;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            border: 1px solid var(--border-color);
+        }
+
+        .chat-header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--primary-hover);
+        }
+
+        .chat-header h3 {
+            margin: 0;
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 15px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            max-height: min(350px, calc(100vh - 300px));
+            background-color: var(--card-bg);
+        }
+
+        .message {
+            max-width: 80%;
+            padding: 12px 16px;
+            margin-bottom: 12px;
+            border-radius: 18px;
+            word-wrap: break-word;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+            line-height: 1.5;
+        }
+
+        .user-message {
+            background-color: #e7f0ff;
+            align-self: flex-end;
+            border-bottom-right-radius: 5px;
+            color: #2c3e50;
+        }
+
+        .ai-message {
+            background-color: #f5f7fa;
+            align-self: flex-start;
+            border-bottom-left-radius: 5px;
+            color: #34495e;
+        }
+
+        .ai-message a {
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        .ai-message a:hover {
+            text-decoration: underline;
+        }
+
+        .ai-message code {
+            background-color: #f0f2f5;
+            padding: 2px 4px;
+            border-radius: 3px;
+            font-family: monospace;
+            font-size: 0.9em;
+        }
+
+        .ai-message pre {
+            background-color: #f0f2f5;
+            padding: 10px;
+            border-radius: 5px;
+            overflow-x: auto;
+            margin: 10px 0;
+        }
+
+        .ai-message pre code {
+            background-color: transparent;
+            padding: 0;
+        }
+
+        .ai-message ul, .ai-message ol {
+            padding-left: 20px;
+            margin: 10px 0;
+        }
+
+        .ai-message p {
+            margin: 8px 0;
+        }
+
+        .ai-message h1, .ai-message h2, .ai-message h3,
+        .ai-message h4, .ai-message h5, .ai-message h6 {
+            margin: 10px 0 5px 0;
+            font-weight: 600;
+        }
+
+        .ai-message blockquote {
+            border-left: 3px solid var(--primary-color);
+            padding-left: 10px;
+            margin: 10px 0;
+            color: #7f8c8d;
+        }
+
+        .chat-hidden {
+            display: none;
+        }
+
+        /* SimpleMDE 에디터 - 최소한의 스타일만 */
+        .CodeMirror {
+            border-radius: 8px;
+            border-color: var(--border-color);
+            transition: border-color 0.3s ease;
+        }
+
+        .editor-toolbar {
+            border-top-left-radius: 8px;
+            border-top-right-radius: 8px;
+            border-color: var(--border-color);
+            background-color: var(--bg-color);
+            transition: background-color 0.3s ease;
+        }
+
+        .editor-toolbar a {
+            color: var(--text-color) !important;
+        }
+
+        .editor-toolbar a:hover,
+        .editor-toolbar a.active {
+            background-color: rgba(59, 89, 152, 0.1);
+            border-color: var(--primary-color);
+        }
+
+        .editor-toolbar.fullscreen {
+            background-color: var(--card-bg);
+        }
+
+        .CodeMirror-fullscreen,
+        .editor-preview-side {
+            z-index: 999;
+        }
+
+        /* 다크 모드 지원 */
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-color: #1a1a1a;
+                --card-bg: #2d2d2d;
+                --text-color: #ffffff;
+                --text-muted: #adb5bd;
+                --border-color: #404040;
+            }
+
+            .markdown-body {
+                color: var(--text-color) !important;
+            }
+
+            .CodeMirror {
+                background-color: #2a2a2a;
+                color: #ffffff;
+            }
+
+            .CodeMirror-cursor {
+                border-left-color: #ffffff;
+            }
+
+            .user-message {
+                background-color: #1e3a8a;
+                color: #e2e8f0;
+            }
+
+            .ai-message {
+                background-color: #374151;
+                color: #e5e7eb;
+            }
+
+            .ai-message code {
+                background-color: rgba(255, 255, 255, 0.1);
+                color: #fbbf24;
+            }
+
+            .ai-message pre {
+                background-color: #1f2937;
+                color: #e5e7eb;
+            }
+
+            .editor-preview-side {
+                background: #2a2a2a;
+            }
+        }
+
+        /* 모바일 최적화 */
+        @media (max-width: 768px) {
+            body {
+                padding: 15px 0 120px;
+            }
+
+            .container {
+                padding: 0 15px;
+            }
+
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+
+            .header h1 {
+                font-size: 1.5rem;
+            }
+
+            .header-actions {
+                width: 100%;
+                justify-content: space-between;
+            }
+
+            .editor-container,
+            .preview-container {
+                padding: 15px;
+                margin-bottom: 20px;
+            }
+
+            .editor-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+
+            .editor-title,
+            .preview-title {
+                font-size: 1.2rem;
+            }
+
+            .editor-actions {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .action-buttons {
+                justify-content: center;
+            }
+
+            .action-btn {
+                padding: 10px 15px;
+            }
+
+            .markdown-body {
+                padding: 15px;
+                font-size: 14px;
+            }
+
+            .chat-input-container {
+                bottom: 25px;
+                padding: 8px 15px;
+            }
+
+            .chat-input-container input {
+                padding: 10px;
+                font-size: 16px; /* iOS 줌 방지 */
+            }
+
+            .chat-container {
+                bottom: 90px;
+            }
+
+            .chat-header {
+                padding: 12px 15px;
+            }
+
+            .chat-messages {
+                padding: 12px;
+            }
+
+            .message {
+                max-width: 85%;
+                padding: 10px 14px;
+                font-size: 14px;
+            }
+
+            /* 모바일에서 SimpleMDE 툴바 최적화 */
+            .editor-toolbar {
+                padding: 8px;
+            }
+
+            .editor-toolbar a {
+                padding: 8px !important;
+                margin: 1px !important;
+                font-size: 14px !important;
+            }
+
+            .CodeMirror {
+                font-size: 16px; /* iOS 줌 방지 */
+            }
+        }
+
+        /* 작은 모바일 화면 */
+        @media (max-width: 480px) {
+            .container {
+                padding: 0 10px;
+            }
+
+            .header h1 {
+                font-size: 1.3rem;
+            }
+
+            .editor-container,
+            .preview-container {
+                padding: 12px;
+            }
+
+            .editor-title,
+            .preview-title {
+                font-size: 1.1rem;
+            }
+
+            .btn-primary,
+            .btn-outline-primary {
+                padding: 6px 12px;
+                font-size: 0.9rem;
+            }
+
+            .username {
+                padding: 4px 8px;
+                font-size: 0.8rem;
+            }
+
+            .action-btn {
+                padding: 8px 12px;
+                font-size: 0.8rem;
+            }
+
+            .chat-input-container {
+                bottom: 20px;
+                padding: 6px 12px;
+            }
+
+            .chat-input-container input {
+                padding: 8px;
+                font-size: 15px;
+            }
+
+            .chat-input-container button {
+                width: 36px;
+                height: 36px;
+            }
+
+            .message {
+                padding: 8px 12px;
+                font-size: 13px;
+            }
+        }
+
+        /* 가로 모드 모바일 */
+        @media (max-height: 600px) and (orientation: landscape) {
+            body {
+                padding: 10px 0 100px;
+            }
+
+            .header {
+                margin-bottom: 15px;
+                padding-bottom: 10px;
+            }
+
+            .editor-container,
+            .preview-container {
+                margin-bottom: 15px;
+                padding: 15px;
+            }
+
+            .chat-container {
+                max-height: calc(100vh - 120px);
+                bottom: 70px;
+            }
+
+            .chat-input-container {
+                bottom: 15px;
+            }
+        }
+
+        /* 터치 디바이스 최적화 */
+        @media (hover: none) and (pointer: coarse) {
+            .action-btn,
+            .btn-primary,
+            .btn-outline-primary,
+            .chat-input-container button {
+                min-height: 44px;
+            }
+
+            .editor-toolbar a {
+                min-height: 44px !important;
+                min-width: 44px !important;
+            }
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>RealNote</h1>
+            <div class="header-actions">
+                <a href="{{ url_for('home') }}" class="btn btn-outline-primary">
+                    <i class="bi bi-arrow-left"></i> 목록으로
+                </a>
+                <span class="username">{{ session.username }}</span>
+            </div>
+        </div>
+
+        <div class="editor-container">
+            <div class="editor-header">
+                <h2 class="editor-title">{{ doc_id }}</h2>
+                <div class="editor-status" id="autosave-status"></div>
+            </div>
+
+            <form method="post" onsubmit="return false;">
+                <textarea id="editor" name="content" spellcheck="false">{{ content }}</textarea>
+            </form>
+
+            <div class="editor-actions">
+                <div class="action-buttons">
+                    <a href="{{ url_for('raw_doc', doc_id=doc_id) }}" class="action-btn">
+                        <i class="bi bi-download"></i> 다운로드
+                    </a>
+                    <a href="#" id="copy-link-btn" class="action-btn">
+                        <i class="bi bi-link-45deg"></i> 공유 링크 복사
+                    </a>
+                    <span id="copy-link-msg" style="color: var(--success-color); margin-left: 10px;"></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="preview-container">
+            <div class="preview-header">
+                <h2 class="preview-title">미리보기</h2>
+            </div>
+            <div id="preview" class="markdown-body"></div>
+        </div>
+    </div>
+
+    <!-- AI 채팅 UI -->
+    <div class="chat-input-container">
+        <input type="text" id="chat-input-field" placeholder="AI 어시스턴트와 채팅하기...">
+        <button id="chat-send-btn">
+            <i class="bi bi-send"></i>
+        </button>
+    </div>
+
+    <div class="chat-container chat-hidden" id="chat-container">
+        <div class="chat-header">
+            <h3>AI 어시스턴트</h3>
+            <span id="chat-close" style="cursor: pointer;"><i class="bi bi-x-lg"></i></span>
+        </div>
+        <div class="chat-messages" id="chat-messages">
+            <div class="message ai-message">안녕하세요! 노트 작성에 도움이 필요하신가요?</div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/simplemde/dist/simplemde.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script>
+        marked.setOptions({
+            breaks: true
+        });
+
+        var simplemde = new SimpleMDE({
+            element: document.getElementById("editor"),
+            spellChecker: false,
+            forceSync: true,
+            placeholder: "마크다운으로 노트를 작성해보세요...",
+            status: false,
+            autofocus: true,
+            toolbar: [
+                "bold", "italic", "heading", "|",
+                "quote", "unordered-list", "ordered-list", "|",
+                "link", "image", "table", "horizontal-rule", "|",
+                "preview", "side-by-side", "fullscreen", "|",
+                "guide"
+            ]
+        });
+
+        function updatePreview() {
+            const content = simplemde.value();
+            document.getElementById("preview").innerHTML = marked.parse(content);
+        }
+        simplemde.codemirror.on("change", updatePreview);
+        updatePreview();
+
+        // 자동 저장 기능
+        let autosaveTimer = null;
+        let lastSavedContent = simplemde.value();
+
+        function autosave() {
+            const content = simplemde.value();
+            if (content === lastSavedContent) return;
+
+            fetch(`/api/doc/{{ doc_id }}`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ content: content })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    lastSavedContent = content;
+                    document.getElementById("autosave-status").textContent = "자동 저장됨";
+                    setTimeout(() => {
+                        document.getElementById("autosave-status").textContent = "";
+                    }, 1500);
+                }
+            })
+            .catch(error => {
+                console.error('자동 저장 실패:', error);
+                document.getElementById("autosave-status").textContent = "저장 실패";
+                document.getElementById("autosave-status").style.color = "#e74c3c";
+            });
+        }
+
+        simplemde.codemirror.on("change", function() {
+            document.getElementById("autosave-status").textContent = "저장 중...";
+            document.getElementById("autosave-status").style.color = "var(--success-color)";
+            if (autosaveTimer) clearTimeout(autosaveTimer);
+            autosaveTimer = setTimeout(autosave, 1000);
+        });
+
+        // 공유 링크 복사
+        document.getElementById('copy-link-btn').addEventListener('click', function(e) {
+            e.preventDefault();
+            const currentUrl = window.location.href;
+            const shareUrl = currentUrl.replace('/doc/', '/share/');
+
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(shareUrl)
+                    .then(function() {
+                        document.getElementById('copy-link-msg').textContent = "공유 링크가 복사되었습니다!";
+                        setTimeout(() => {
+                            document.getElementById('copy-link-msg').textContent = "";
+                        }, 1500);
+                    })
+                    .catch(function(err) {
+                        fallbackCopyToClipboard(shareUrl);
+                    });
+            } else {
+                fallbackCopyToClipboard(shareUrl);
+            }
+
+            function fallbackCopyToClipboard(text) {
+                const textArea = document.createElement('textarea');
+                textArea.value = text;
+                textArea.style.position = 'fixed';
+                textArea.style.left = '-999999px';
+                textArea.style.top = '-999999px';
+                document.body.appendChild(textArea);
+                textArea.focus();
+                textArea.select();
+
+                try {
+                    const successful = document.execCommand('copy');
+                    if (successful) {
+                        document.getElementById('copy-link-msg').textContent = "공유 링크가 복사되었습니다!";
+                    } else {
+                        document.getElementById('copy-link-msg').textContent = "링크: " + text;
+                    }
+                } catch (err) {
+                    document.getElementById('copy-link-msg').textContent = "링크: " + text;
+                }
+
+                document.body.removeChild(textArea);
+                setTimeout(() => {
+                    document.getElementById('copy-link-msg').textContent = "";
+                }, 3000);
+            }
+        });
+
+        // AI 채팅 기능
+        const chatContainer = document.getElementById('chat-container');
+        const chatClose = document.getElementById('chat-close');
+        const chatMessages = document.getElementById('chat-messages');
+        const chatInput = document.getElementById('chat-input-field');
+        const chatSendBtn = document.getElementById('chat-send-btn');
+
+        chatInput.addEventListener('focus', function() {
+            chatContainer.classList.remove('chat-hidden');
+        });
+
+        chatClose.addEventListener('click', function() {
+            chatContainer.classList.add('chat-hidden');
+        });
+
+        document.addEventListener('click', function(event) {
+            if (!chatContainer.classList.contains('chat-hidden') &&
+                !chatContainer.contains(event.target) &&
+                !chatInput.contains(event.target) &&
+                event.target !== chatInput &&
+                event.target !== chatSendBtn &&
+                !chatSendBtn.contains(event.target)) {
+                chatContainer.classList.add('chat-hidden');
+            }
+        });
+
+        chatContainer.addEventListener('click', function(event) {
+            event.stopPropagation();
+        });
+
+        document.querySelector('.chat-input-container').addEventListener('click', function(event) {
+            event.stopPropagation();
+        });
+
+        function sendMessage() {
+            const message = chatInput.value.trim();
+            if (message === '') return;
+
+            addMessage(message, 'user');
+            chatInput.value = '';
+
+            const noteContent = simplemde.value();
+            const noteTitle = "{{ doc_id }}";
+
+            streamChatCompletion([
+                { role: "system", content: `현재 사용자가 작성 중인 노트 제목: "${noteTitle}"\n\n노트 내용:\n${noteContent}\n\n위 노트 내용을 참고하여 사용자의 질문에 답변해주세요.` },
+                { role: "user", content: message }
+            ]);
+        }
+
+        chatSendBtn.addEventListener('click', sendMessage);
+
+        chatInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+
+        function addMessage(text, sender) {
+            const messageDiv = document.createElement('div');
+            messageDiv.classList.add('message');
+            messageDiv.classList.add(sender === 'user' ? 'user-message' : 'ai-message');
+
+            if (sender === 'user') {
+                messageDiv.textContent = text;
+            } else {
+                messageDiv.innerHTML = marked.parse(text);
+            }
+
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        async function streamChatCompletion(messages, options = {}) {
+            const loadingDiv = document.createElement('div');
+            loadingDiv.classList.add('message', 'ai-message');
+            loadingDiv.textContent = '...';
+            chatMessages.appendChild(loadingDiv);
+
+            const url = "https://text.pollinations.ai/openai";
+            const payload = {
+                model: options.model || "openai-large",
+                messages: messages,
+                stream: true
+            };
+
+            try {
+                const response = await fetch(url, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Accept: "text/event-stream"
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder();
+                let buffer = "";
+                let responseText = "";
+
+                chatMessages.removeChild(loadingDiv);
+
+                const aiMessageDiv = document.createElement('div');
+                aiMessageDiv.classList.add('message', 'ai-message');
+                chatMessages.appendChild(aiMessageDiv);
+
+                while (true) {
+                    const { done, value } = await reader.read();
+                    if (done) break;
+
+                    buffer += decoder.decode(value, { stream: true });
+
+                    const lines = buffer.split("\n\n");
+                    buffer = lines.pop();
+
+                    for (const line of lines) {
+                        if (line.startsWith("data: ")) {
+                            const dataStr = line.substring(6).trim();
+                            if (dataStr === "[DONE]") continue;
+
+                            try {
+                                const chunk = JSON.parse(dataStr);
+                                const content = chunk?.choices?.[0]?.delta?.content;
+                                if (content) {
+                                    responseText += content;
+                                    aiMessageDiv.innerHTML = marked.parse(responseText);
+                                    chatMessages.scrollTop = chatMessages.scrollHeight;
+                                }
+                            } catch (e) {
+                                console.error("Failed to parse stream chunk:", dataStr, e);
+                            }
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error("Error during streaming chat completion:", error);
+                loadingDiv.textContent = `오류가 발생했습니다: ${error.message}`;
+            }
+        }
+
+        // 키보드 단축키
+        document.addEventListener('keydown', function(e) {
+            // Ctrl/Cmd + S: 수동 저장
+            if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+                e.preventDefault();
+                autosave();
+            }
+
+            // Escape: 채팅창 닫기
+            if (e.key === 'Escape' && !chatContainer.classList.contains('chat-hidden')) {
+                chatContainer.classList.add('chat-hidden');
+            }
+        });
+
+        // 페이지 언로드 시 저장 확인
+        window.addEventListener('beforeunload', function(e) {
+            const content = simplemde.value();
+            if (content !== lastSavedContent) {
+                e.preventDefault();
+                e.returnValue = '저장되지 않은 변경사항이 있습니다.';
+                return e.returnValue;
+            }
+        });
+
+        console.log('RealNote 에디터 초기화 완료');
+    </script>
+</body>
+</html>

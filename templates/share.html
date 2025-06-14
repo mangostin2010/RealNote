@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RealNote - {{ doc_id }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@5.1.0/github-markdown.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Pretendard', 'Noto Sans KR', sans-serif;
+            padding-top: 20px;
+            padding-bottom: 40px;
+        }
+        .container {
+            max-width: 900px;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #e1e1e1;
+        }
+        .header h1 {
+            font-weight: 700;
+            color: #3b5998;
+            margin-bottom: 0;
+        }
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .username {
+            font-weight: 600;
+            color: #555;
+        }
+        .document-container {
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+        .document-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #e1e1e1;
+        }
+        .document-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #333;
+            margin: 0;
+        }
+        .document-meta {
+            font-size: 14px;
+            color: #777;
+        }
+        .markdown-body {
+            padding: 0;
+            background: #fff !important;
+            color: #222 !important;
+            border-radius: 8px;
+        }
+        .btn-outline-primary {
+            color: #3b5998;
+            border-color: #3b5998;
+        }
+        .btn-outline-primary:hover {
+            background-color: #3b5998;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>RealNote</h1>
+            <div class="header-actions">
+                {% if session.username %}
+                <a href="{{ url_for('home') }}" class="btn btn-outline-primary">
+                    <i class="bi bi-arrow-left"></i> 내 노트로
+                </a>
+                <span class="username">{{ session.username }}</span>
+                {% else %}
+                <a href="{{ url_for('login') }}" class="btn btn-outline-primary">
+                    <i class="bi bi-box-arrow-in-right"></i> 로그인
+                </a>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div style="background:#fff; border-radius:16px; box-shadow:0 4px 16px rgba(0,0,0,0.06); padding:32px 24px; margin-bottom:32px;">
+            <div style="font-size:1.5rem; font-weight:700; color:#222; margin-bottom:18px;">미리보기</div>
+            <div style="border:1px solid #e1e1e1; border-radius:8px; padding:28px 20px; background:#fff;">
+                <div style="font-size:1.1rem; color:#555; margin-bottom:10px;">
+                    <b>{{ doc_id }}</b>
+                    <span style="font-size:0.95rem; color:#888; margin-left:10px;">
+                        {% if owner %}작성자: {{ owner }}{% endif %}
+                    </span>
+                </div>
+                <div id="preview" class="markdown-body"></div>
+            </div>
+        </div>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            marked.setOptions({
+                breaks: true
+            });
+            const content = {{ content|tojson }};
+            document.getElementById('preview').innerHTML = marked.parse(content);
+        });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

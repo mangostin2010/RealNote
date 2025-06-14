@@ -1,0 +1,1117 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>RealNote - 마크다운 노트</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --primary-color: #3b5998;
+            --primary-hover: #2d4373;
+            --success-color: #4CAF50;
+            --success-hover: #3d8b40;
+            --danger-color: #dc3545;
+            --danger-hover: #bd2130;
+            --text-color: #333;
+            --text-muted: #6c757d;
+            --border-color: #e1e1e1;
+            --bg-color: #f8f9fa;
+            --card-bg: white;
+            --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.05);
+            --shadow-hover: 0 6px 20px rgba(0, 0, 0, 0.1);
+            --border-radius: 12px;
+            --border-radius-sm: 8px;
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            font-family: 'Pretendard', 'Noto Sans KR', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            padding: 20px 0 40px;
+            margin: 0;
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid var(--border-color);
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .header h1 {
+            font-weight: 700;
+            color: var(--primary-color);
+            margin: 0;
+            font-size: 2.2rem;
+            letter-spacing: -0.5px;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .username {
+            font-weight: 600;
+            color: var(--text-color);
+            padding: 8px 16px;
+            background-color: rgba(59, 89, 152, 0.1);
+            border-radius: 20px;
+            font-size: 0.9rem;
+        }
+
+        .logout-btn {
+            color: var(--danger-color);
+            text-decoration: none;
+            font-weight: 500;
+            padding: 8px 16px;
+            border-radius: var(--border-radius-sm);
+            transition: var(--transition);
+            font-size: 0.9rem;
+        }
+
+        .logout-btn:hover {
+            background-color: rgba(220, 53, 69, 0.1);
+            color: var(--danger-hover);
+        }
+
+        .feature-card {
+            background-color: var(--card-bg);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-sm);
+            padding: 25px;
+            margin-bottom: 25px;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            transition: var(--transition);
+        }
+
+        .feature-card:hover {
+            box-shadow: var(--shadow-hover);
+            transform: translateY(-2px);
+        }
+
+        .feature-card h2 {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: var(--text-color);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .feature-card h2::before {
+            content: '';
+            width: 4px;
+            height: 24px;
+            background: linear-gradient(135deg, var(--primary-color), var(--success-color));
+            border-radius: 2px;
+        }
+
+        .create-form {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .create-form input {
+            flex: 1;
+            min-width: 250px;
+            padding: 15px 16px;
+            border-radius: var(--border-radius-sm);
+            border: 2px solid var(--border-color);
+            font-size: 16px;
+            transition: var(--transition);
+            background-color: #fafafa;
+        }
+
+        .create-form input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(59, 89, 152, 0.1);
+            background-color: white;
+        }
+
+        .create-form button {
+            padding: 15px 24px;
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
+            color: white;
+            border: none;
+            border-radius: var(--border-radius-sm);
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 16px;
+            white-space: nowrap;
+            min-height: 54px;
+        }
+
+        .create-form button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(59, 89, 152, 0.3);
+        }
+
+        .create-form button:active {
+            transform: translateY(0);
+        }
+
+        .voice-note-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 15px 24px;
+            background: linear-gradient(135deg, var(--success-color), var(--success-hover));
+            color: white;
+            border: none;
+            border-radius: var(--border-radius-sm);
+            font-weight: 600;
+            text-decoration: none;
+            transition: var(--transition);
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .voice-note-btn:hover {
+            color: white;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+        }
+
+        .voice-note-btn i {
+            font-size: 1.1rem;
+        }
+
+        .note-list {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .note-item {
+            background-color: var(--card-bg);
+            border-radius: var(--border-radius-sm);
+            margin-bottom: 12px;
+            padding: 17px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: var(--transition);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .note-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: linear-gradient(135deg, var(--primary-color), var(--success-color));
+            transform: scaleY(0);
+            transition: var(--transition);
+        }
+
+        .note-item:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .note-item:hover::before {
+            transform: scaleY(1);
+        }
+
+        .note-title {
+            font-weight: 600;
+            color: var(--text-color);
+            text-decoration: none;
+            font-size: 1.1rem;
+            transition: var(--transition);
+            flex: 1;
+            margin-right: 15px;
+            word-break: break-word;
+        }
+
+        .note-title:hover {
+            color: var(--primary-color);
+        }
+
+        .note-actions {
+            display: flex;
+            gap: 15px;
+            flex-shrink: 0;
+        }
+
+        .note-actions a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 12px;
+            border-radius: var(--border-radius-sm);
+            transition: var(--transition);
+            font-weight: 500;
+        }
+
+        .note-actions a:hover {
+            color: var(--primary-color);
+            background-color: rgba(59, 89, 152, 0.1);
+        }
+
+        .delete-doc {
+            color: var(--danger-color) !important;
+        }
+
+        .delete-doc:hover {
+            color: var(--danger-hover) !important;
+            background-color: rgba(220, 53, 69, 0.1) !important;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-muted);
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            color: #adb5bd;
+            opacity: 0.7;
+        }
+
+        .empty-state p {
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+            line-height: 1.6;
+        }
+
+        .empty-state .highlight {
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        /* 로딩 애니메이션 */
+        .loading {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+
+        .loading::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 20px;
+            height: 20px;
+            margin: -10px 0 0 -10px;
+            border: 2px solid transparent;
+            border-top: 2px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* 태블릿 최적화 */
+        @media (max-width: 992px) {
+            .container {
+                max-width: 100%;
+                padding: 0 25px;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .feature-card {
+                padding: 20px;
+            }
+
+            .note-item {
+                padding: 18px;
+            }
+        }
+
+        /* 모바일 최적화 */
+        @media (max-width: 768px) {
+            body {
+                padding: 15px 0 30px;
+            }
+
+            .container {
+                padding: 0 20px;
+            }
+
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+                margin-bottom: 25px;
+                padding-bottom: 15px;
+            }
+
+            .header h1 {
+                font-size: 1.8rem;
+            }
+
+            .user-info {
+                width: 100%;
+                justify-content: space-between;
+            }
+
+            .feature-card {
+                padding: 20px 15px;
+                margin-bottom: 20px;
+            }
+
+            .feature-card h2 {
+                font-size: 1.2rem;
+                margin-bottom: 15px;
+            }
+
+            .create-form {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .create-form input {
+                min-width: 100%;
+                padding: 16px;
+            }
+
+            .create-form button {
+                width: 100%;
+                padding: 16px;
+                min-height: 52px;
+            }
+
+            .voice-note-btn {
+                width: 100%;
+                justify-content: center;
+                padding: 16px;
+            }
+
+            .note-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+                padding: 15px;
+            }
+
+            .note-title {
+                margin-right: 0;
+                font-size: 1rem;
+            }
+
+            .note-actions {
+                width: 100%;
+                justify-content: space-between;
+                gap: 10px;
+            }
+
+            .note-actions a {
+                flex: 1;
+                justify-content: center;
+                padding: 10px 8px;
+                font-size: 0.85rem;
+            }
+
+            .empty-state {
+                padding: 40px 15px;
+            }
+
+            .empty-state i {
+                font-size: 3rem;
+            }
+
+            .empty-state p {
+                font-size: 1rem;
+            }
+        }
+
+        /* 작은 모바일 화면 */
+        @media (max-width: 480px) {
+            .container {
+                padding: 0 15px;
+            }
+
+            .header h1 {
+                font-size: 1.6rem;
+            }
+
+            .feature-card {
+                padding: 15px;
+            }
+
+            .feature-card h2 {
+                font-size: 1.1rem;
+            }
+
+            .username {
+                font-size: 0.8rem;
+                padding: 6px 12px;
+            }
+
+            .logout-btn {
+                font-size: 0.8rem;
+                padding: 6px 12px;
+            }
+
+            .note-actions a {
+                font-size: 0.8rem;
+                padding: 8px 6px;
+            }
+        }
+
+        /* 매우 작은 화면 */
+        @media (max-width: 360px) {
+            .container {
+                padding: 0 10px;
+            }
+
+            .feature-card {
+                padding: 12px;
+            }
+
+            .note-item {
+                padding: 12px;
+            }
+        }
+
+        /* 가로 모드 모바일 */
+        @media (max-height: 600px) and (orientation: landscape) {
+            body {
+                padding: 10px 0 20px;
+            }
+
+            .header {
+                margin-bottom: 20px;
+                padding-bottom: 10px;
+            }
+
+            .header h1 {
+                font-size: 1.5rem;
+            }
+
+            .feature-card {
+                margin-bottom: 15px;
+                padding: 15px;
+            }
+
+            .feature-card h2 {
+                font-size: 1.1rem;
+                margin-bottom: 12px;
+            }
+
+            .empty-state {
+                padding: 30px 15px;
+            }
+
+            .empty-state i {
+                font-size: 2.5rem;
+                margin-bottom: 15px;
+            }
+
+            .note-item {
+                padding: 12px 15px;
+            }
+        }
+
+        /* 터치 디바이스 최적화 */
+        @media (hover: none) and (pointer: coarse) {
+            .create-form input,
+            .create-form button,
+            .voice-note-btn,
+            .note-actions a {
+                min-height: 48px;
+            }
+
+            .note-item {
+                min-height: 60px;
+            }
+
+            /* 터치 피드백 */
+            .create-form button:active,
+            .voice-note-btn:active,
+            .note-actions a:active {
+                transform: scale(0.98);
+            }
+        }
+
+        /* 고해상도 디스플레이 */
+        @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+            .feature-card h2::before {
+                width: 3px;
+            }
+
+            .note-item::before {
+                width: 3px;
+            }
+        }
+
+        /* 다크 모드 지원 */
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-color: #1a1a1a;
+                --card-bg: #2d2d2d;
+                --text-color: #ffffff;
+                --text-muted: #adb5bd;
+                --border-color: #404040;
+            }
+
+            body {
+                background-color: var(--bg-color);
+                color: var(--text-color);
+            }
+
+            .feature-card {
+                background-color: var(--card-bg);
+                border-color: var(--border-color);
+            }
+
+            .note-item {
+                background-color: var(--card-bg);
+                border-color: var(--border-color);
+            }
+
+            .create-form input {
+                background-color: var(--card-bg);
+                border-color: var(--border-color);
+                color: var(--text-color);
+            }
+
+            .create-form input:focus {
+                background-color: var(--card-bg);
+            }
+
+            .username {
+                background-color: rgba(59, 89, 152, 0.2);
+                color: var(--text-color);
+            }
+        }
+
+        /* 접근성 개선 */
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+
+        /* 포커스 표시 개선 */
+        .create-form input:focus,
+        .create-form button:focus,
+        .voice-note-btn:focus,
+        .note-title:focus,
+        .note-actions a:focus,
+        .logout-btn:focus {
+            outline: 2px solid var(--primary-color);
+            outline-offset: 2px;
+        }
+
+        /* 스크린 리더 전용 텍스트 */
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+
+        /* 인쇄 스타일 */
+        @media print {
+            body {
+                background-color: white;
+                color: black;
+                padding: 0;
+            }
+
+            .feature-card {
+                box-shadow: none;
+                border: 1px solid #ccc;
+            }
+
+            .create-form,
+            .voice-note-btn,
+            .note-actions {
+                display: none;
+            }
+
+            .logout-btn {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>RealNote</h1>
+            <div class="user-info">
+                <span class="username">{{ session.username }}</span>
+                <a href="{{ url_for('logout') }}" class="logout-btn" aria-label="로그아웃">로그아웃</a>
+            </div>
+        </header>
+        
+        <main>
+            <section class="feature-card">
+                <h2>
+                    <span class="sr-only">새 노트 만들기 섹션</span>
+                    새 노트 만들기
+                </h2>
+                <form id="create-doc-form" class="create-form" role="form">
+                    <label for="doc-id-input" class="sr-only">노트 이름 입력</label>
+                    <input 
+                        type="text" 
+                        id="doc-id-input" 
+                        placeholder="새 노트 이름 또는 기존 노트 이름 입력" 
+                        required 
+                        autocomplete="off"
+                        aria-describedby="doc-input-help"
+                    >
+                    <div id="doc-input-help" class="sr-only">
+                        새 노트를 만들거나 기존 노트를 열 수 있습니다
+                    </div>
+                    <button type="submit" aria-label="노트 열기 또는 생성">
+                        <i class="bi bi-plus-circle" aria-hidden="true"></i>
+                        노트 열기/생성
+                    </button>
+                </form>
+            </section>
+            
+            <section class="feature-card" style="display: none;">
+                <h2>
+                    <span class="sr-only">음성 노트 섹션</span>
+                    음성으로 노트 만들기
+                </h2>
+                <a href="{{ url_for('voice_note') }}" class="voice-note-btn" aria-label="음성으로 새 노트 만들기">
+                    <i class="bi bi-mic-fill" aria-hidden="true"></i>
+                    음성 노트 시작하기
+                </a>
+            </section>
+            
+            <section class="feature-card">
+                <h2>
+                    <span class="sr-only">노트 목록 섹션</span>
+                    내 노트 목록
+                </h2>
+                {% if docs %}
+                <ul class="note-list" role="list" aria-label="저장된 노트 목록">
+                    {% for doc in docs %}
+                    <li id="doc-{{ doc }}" class="note-item" role="listitem">
+                        <a href="{{ url_for('edit_doc', doc_id=doc) }}" class="note-title" aria-label="{{ doc }} 노트 편집">
+                            {{ doc }}
+                        </a>
+                        <div class="note-actions" role="group" aria-label="{{ doc }} 노트 작업">
+                            <a href="{{ url_for('raw_doc', doc_id=doc) }}" aria-label="{{ doc }} 노트 다운로드">
+                                <i class="bi bi-download" aria-hidden="true"></i>
+                                <span>다운로드</span>
+                            </a>
+                            <a href="#" class="delete-doc" data-doc-id="{{ doc }}" aria-label="{{ doc }} 노트 삭제">
+                                <i class="bi bi-trash" aria-hidden="true"></i>
+                                <span>삭제</span>
+                            </a>
+                        </div>
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                <div class="empty-state" role="status" aria-label="노트 없음">
+                    <i class="bi bi-journal-text" aria-hidden="true"></i>
+                    <p>아직 작성된 노트가 없습니다.</p>
+                    <p><span class="highlight">위의 폼을 사용하여</span> 첫 번째 노트를 만들어보세요!</p>
+                </div>
+                {% endif %}
+            </section>
+        </main>
+    </div>
+
+    <!-- Toast 알림 -->
+    <div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 1050;">
+        <div id="notification-toast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="toast-header">
+                <i class="bi bi-info-circle text-primary me-2"></i>
+                <strong class="me-auto">알림</strong>
+                <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="알림 닫기"></button>
+            </div>
+            <div class="toast-body" id="toast-message">
+                <!-- 메시지가 여기에 표시됩니다 -->
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Toast 알림 함수
+        function showToast(message, type = 'info') {
+            const toast = document.getElementById('notification-toast');
+            const toastMessage = document.getElementById('toast-message');
+            const toastHeader = toast.querySelector('.toast-header i');
+            
+            toastMessage.textContent = message;
+            
+            // 아이콘과 색상 변경
+            toastHeader.className = `bi me-2 ${
+                type === 'success' ? 'bi-check-circle text-success' :
+                type === 'error' ? 'bi-exclamation-triangle text-danger' :
+                'bi-info-circle text-primary'
+            }`;
+            
+            const bsToast = new bootstrap.Toast(toast);
+            bsToast.show();
+        }
+
+        // 문서 삭제 기능 개선
+        document.querySelectorAll('.delete-doc').forEach(function(element) {
+            element.addEventListener('click', function(e) {
+                e.preventDefault();
+                const docId = this.getAttribute('data-doc-id');
+                const docItem = document.getElementById('doc-' + docId);
+                
+                // 확인 대화상자
+                if (confirm(`정말로 "${docId}" 노트를 삭제하시겠습니까?\n\n이 작업은 되돌릴 수 없습니다.`)) {
+                    // 로딩 상태 표시
+                    docItem.classList.add('loading');
+                    this.style.pointerEvents = 'none';
+                    
+                    fetch('/api/doc/' + encodeURIComponent(docId), {
+                        method: 'DELETE',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        }
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('네트워크 오류가 발생했습니다.');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (data.success) {
+                            // 부드러운 삭제 애니메이션
+                            docItem.style.transition = 'all 0.3s ease';
+                            docItem.style.transform = 'translateX(-100%)';
+                            docItem.style.opacity = '0';
+                            
+                            setTimeout(() => {
+                                docItem.remove();
+                                showToast(`"${docId}" 노트가 삭제되었습니다.`, 'success');
+                                
+                                // 노트가 모두 삭제되었는지 확인
+                                if (document.querySelectorAll('.note-item').length === 0) {
+                                    const noteList = document.querySelector('.note-list');
+                                    const emptyState = document.createElement('div');
+                                    emptyState.className = 'empty-state';
+                                    emptyState.setAttribute('role', 'status');
+                                    emptyState.setAttribute('aria-label', '노트 없음');
+                                    emptyState.innerHTML = `
+                                        <i class="bi bi-journal-text" aria-hidden="true"></i>
+                                        <p>아직 작성된 노트가 없습니다.</p>
+                                        <p><span class="highlight">위의 폼을 사용하여</span> 첫 번째 노트를 만들어보세요!</p>
+                                    `;
+                                    noteList.parentNode.replaceChild(emptyState, noteList);
+                                }
+                            }, 300);
+                        } else {
+                            throw new Error(data.message || '삭제 중 오류가 발생했습니다.');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        showToast(error.message, 'error');
+                        docItem.classList.remove('loading');
+                        this.style.pointerEvents = 'auto';
+                    });
+                }
+            });
+        });
+
+        // 문서 생성/이동 기능 개선
+        const createForm = document.getElementById('create-doc-form');
+        const docInput = document.getElementById('doc-id-input');
+        const submitBtn = createForm.querySelector('button[type="submit"]');
+        
+        createForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const docId = docInput.value.trim();
+            
+            if (!docId) {
+                showToast('노트 이름을 입력해주세요.', 'error');
+                docInput.focus();
+                return;
+            }
+            
+            // 특수문자 검증
+            if (!/^[a-zA-Z0-9가-힣\s\-_]+$/.test(docId)) {
+                showToast('노트 이름에는 한글, 영문, 숫자, 공백, 하이픈(-), 언더스코어(_)만 사용할 수 있습니다.', 'error');
+                docInput.focus();
+                return;
+            }
+            
+            // 로딩 상태
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="bi bi-arrow-clockwise" aria-hidden="true"></i> 처리 중...';
+            
+            // 페이지 이동
+            setTimeout(() => {
+                window.location.href = '/doc/' + encodeURIComponent(docId);
+            }, 500);
+        });
+
+        // 입력 필드 실시간 검증
+        docInput.addEventListener('input', function() {
+            const value = this.value.trim();
+            const submitBtn = createForm.querySelector('button[type="submit"]');
+            
+            if (value.length === 0) {
+                this.style.borderColor = '';
+                submitBtn.disabled = false;
+                return;
+            }
+            
+            if (!/^[a-zA-Z0-9가-힣\s\-_]+$/.test(value)) {
+                this.style.borderColor = '#dc3545';
+                this.style.boxShadow = '0 0 0 3px rgba(220, 53, 69, 0.1)';
+                submitBtn.disabled = true;
+            } else {
+                this.style.borderColor = '#28a745';
+                this.style.boxShadow = '0 0 0 3px rgba(40, 167, 69, 0.1)';
+                submitBtn.disabled = false;
+            }
+        });
+
+        // 키보드 단축키
+        document.addEventListener('keydown', function(e) {
+            // Ctrl/Cmd + N: 새 노트 생성 포커스
+            if ((e.ctrlKey || e.metaKey) && e.key === 'n') {
+                e.preventDefault();
+                docInput.focus();
+                docInput.select();
+            }
+            
+            // Escape: 입력 필드 초기화
+            if (e.key === 'Escape' && document.activeElement === docInput) {
+                docInput.value = '';
+                docInput.style.borderColor = '';
+                docInput.style.boxShadow = '';
+                docInput.blur();
+            }
+        });
+
+        // 노트 항목 키보드 네비게이션
+        document.querySelectorAll('.note-item').forEach(function(item, index) {
+            const noteTitle = item.querySelector('.note-title');
+            const deleteBtn = item.querySelector('.delete-doc');
+            
+            noteTitle.addEventListener('keydown', function(e) {
+                if (e.key === 'Delete' || e.key === 'Backspace') {
+                    e.preventDefault();
+                    deleteBtn.click();
+                }
+            });
+        });
+
+        // 터치 제스처 지원 (모바일)
+        let touchStartX = 0;
+        let touchStartY = 0;
+        
+        document.querySelectorAll('.note-item').forEach(function(item) {
+            item.addEventListener('touchstart', function(e) {
+                touchStartX = e.touches[0].clientX;
+                touchStartY = e.touches[0].clientY;
+            }, { passive: true });
+            
+            item.addEventListener('touchend', function(e) {
+                const touchEndX = e.changedTouches[0].clientX;
+                const touchEndY = e.changedTouches[0].clientY;
+                const deltaX = touchEndX - touchStartX;
+                const deltaY = touchEndY - touchStartY;
+                
+                // 왼쪽으로 스와이프 (삭제)
+                if (Math.abs(deltaX) > Math.abs(deltaY) && deltaX < -100) {
+                    const deleteBtn = item.querySelector('.delete-doc');
+                    if (deleteBtn) {
+                        deleteBtn.click();
+                    }
+                }
+            }, { passive: true });
+        });
+
+        // 페이지 가시성 API - 탭이 활성화될 때 새로고침
+        document.addEventListener('visibilitychange', function() {
+            if (!document.hidden) {
+                // 5분 이상 비활성화되었다면 새로고침
+                const lastActivity = localStorage.getItem('lastActivity');
+                const now = Date.now();
+                
+                if (lastActivity && (now - parseInt(lastActivity)) > 300000) { // 5분
+                    location.reload();
+                }
+            } else {
+                localStorage.setItem('lastActivity', Date.now().toString());
+            }
+        });
+
+        // 오프라인/온라인 상태 감지
+        window.addEventListener('online', function() {
+            showToast('인터넷 연결이 복구되었습니다.', 'success');
+        });
+
+        window.addEventListener('offline', function() {
+            showToast('인터넷 연결이 끊어졌습니다. 일부 기능이 제한될 수 있습니다.', 'error');
+        });
+
+        // 성능 최적화: Intersection Observer로 애니메이션 최적화
+        if ('IntersectionObserver' in window) {
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '50px'
+            };
+
+            const observer = new IntersectionObserver(function(entries) {
+                entries.forEach(function(entry) {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                    }
+                });
+            }, observerOptions);
+
+            // 초기 로드 시 애니메이션
+            document.querySelectorAll('.feature-card, .note-item').forEach(function(element, index) {
+                element.style.opacity = '0';
+                element.style.transform = 'translateY(20px)';
+                element.style.transition = `opacity 0.6s ease ${index * 0.1}s, transform 0.6s ease ${index * 0.1}s`;
+                observer.observe(element);
+            });
+        }
+
+        // 폼 자동 저장 (로컬 스토리지)
+        docInput.addEventListener('input', function() {
+            localStorage.setItem('draft_note_name', this.value);
+        });
+
+        // 페이지 로드 시 임시 저장된 내용 복원
+        const draftName = localStorage.getItem('draft_note_name');
+        if (draftName && draftName.trim()) {
+            docInput.value = draftName;
+            
+            // 복원 알림
+            setTimeout(() => {
+                showToast('이전에 입력하던 노트 이름을 복원했습니다.', 'info');
+            }, 1000);
+        }
+
+        // 폼 제출 시 임시 저장 내용 삭제
+        createForm.addEventListener('submit', function() {
+            localStorage.removeItem('draft_note_name');
+        });
+
+        // 접근성: 스크린 리더를 위한 라이브 영역 업데이트
+        function updateLiveRegion(message) {
+            let liveRegion = document.getElementById('live-region');
+            if (!liveRegion) {
+                liveRegion = document.createElement('div');
+                liveRegion.id = 'live-region';
+                liveRegion.setAttribute('aria-live', 'polite');
+                liveRegion.setAttribute('aria-atomic', 'true');
+                liveRegion.className = 'sr-only';
+                document.body.appendChild(liveRegion);
+            }
+            liveRegion.textContent = message;
+        }
+
+        // 노트 개수 업데이트
+        function updateNoteCount() {
+            const noteCount = document.querySelectorAll('.note-item').length;
+            const countMessage = noteCount === 0 ? 
+                '저장된 노트가 없습니다.' : 
+                `총 ${noteCount}개의 노트가 있습니다.`;
+            updateLiveRegion(countMessage);
+        }
+
+        // 초기 노트 개수 알림
+        setTimeout(updateNoteCount, 2000);
+
+        // PWA 지원: 서비스 워커 등록
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(function(registration) {
+                        console.log('ServiceWorker registration successful');
+                    })
+                    .catch(function(err) {
+                        console.log('ServiceWorker registration failed');
+                    });
+            });
+        }
+
+        // 앱 설치 프롬프트
+        let deferredPrompt;
+        window.addEventListener('beforeinstallprompt', function(e) {
+            e.preventDefault();
+            deferredPrompt = e;
+            
+            // 설치 버튼 표시 (필요시)
+            const installBtn = document.createElement('button');
+            installBtn.textContent = '앱 설치';
+            installBtn.className = 'btn btn-outline-primary btn-sm';
+            installBtn.style.marginLeft = '10px';
+            
+            installBtn.addEventListener('click', function() {
+                deferredPrompt.prompt();
+                deferredPrompt.userChoice.then(function(choiceResult) {
+                    if (choiceResult.outcome === 'accepted') {
+                        showToast('앱이 설치되었습니다!', 'success');
+                    }
+                    deferredPrompt = null;
+                    installBtn.remove();
+                });
+            });
+            
+            // 헤더에 설치 버튼 추가
+            const userInfo = document.querySelector('.user-info');
+            userInfo.insertBefore(installBtn, userInfo.firstChild);
+        });
+
+        // 초기화 완료 알림
+        console.log('RealNote 초기화 완료');
+        updateLiveRegion('RealNote가 준비되었습니다. 새 노트를 만들거나 기존 노트를 편집할 수 있습니다.');
+    });
+    </script>
+</body>
+</html>

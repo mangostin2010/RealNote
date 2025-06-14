@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>음성 노트 만들기</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h1 {
+            color: #333;
+        }
+        .recorder-container {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+        }
+        .controls {
+            margin: 15px 0;
+        }
+        button {
+            padding: 10px 15px;
+            margin-right: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+        #recordButton {
+            background-color: #f44336;
+        }
+        #stopButton {
+            background-color: #2196F3;
+        }
+        #submitButton {
+            background-color: #4CAF50;
+        }
+        #discardButton {
+            background-color: #9e9e9e;
+        }
+        .recording-status {
+            margin: 10px 0;
+            color: #f44336;
+            font-weight: bold;
+        }
+        .timer {
+            font-size: 1.2em;
+            margin: 10px 0;
+        }
+        .audio-preview {
+            margin: 15px 0;
+            display: none;
+        }
+        .error {
+            color: #f44336;
+            font-weight: bold;
+            margin: 15px 0;
+        }
+        .note-result {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: #f0f8ff;
+        }
+        .markdown-body {
+            padding: 15px;
+            background-color: white;
+            border: 1px solid #eee;
+            border-radius: 5px;
+        }
+        .note-type-selection {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: #f5f5f5;
+        }
+        .note-selection {
+            margin-top: 15px;
+            display: none;
+        }
+        select {
+            padding: 8px;
+            width: 100%;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>음성 노트 만들기</h1>
+    <a href="{{ url_for('home') }}">← 노트 목록으로</a>
+    
+    <div class="note-type-selection">
+        <h3>노트 유형 선택</h3>
+        <div>
+            <input type="radio" id="new-note" name="note-type" value="new" checked>
+            <label for="new-note">새 노트 만들기</label>
+        </div>
+        <div>
+            <input type="radio" id="append-note" name="note-type" value="append">
+            <label for="append-note">기존 노트에 추가하기</label>
+        </div>
+        
+        <div id="note-selection" class="note-selection">
+            <label for="existing-notes">추가할 노트 선택:</label>
+            <select id="existing-notes">
+                {% for doc in docs %}
+                <option value="{{ doc }}">{{ doc }}</option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+    
+    {% if error %}
+    <div class="error">
+        {{ error }}
+    </div>
+    {% endif %}
+    
+    {% if not note %}
+    <div class="recorder-container">
+        <h2>음성 녹음</h2>
+        <div class="controls">
+            <button id="recordButton">녹음 시작</button>
+            <button id="stopButton" disabled>녹음 중지</button>
+        </div>
+        <div id="recordingStatus" class="recording-status"></div>
+        <div id="timer" class="timer"></div>
+        
+        <div id="audioPreview" class="audio-preview">
+            <h3>녹음된 오디오</h3>
+            <audio id="audioPlayback" controls></audio>
+            <div class="controls">
+                <button id="submitButton">노트 생성하기</button>
+                <button id="discardButton">다시 녹음하기</button>
+            </div>
+        </div>
+        
+        <form id="audioForm" action="{{ url_for('voice_note') }}" method="post" enctype="multipart/form-data" style="display: none;">
+            <input type="hidden" name="is_new" id="is_new" value="y">
+            <input type="hidden" name="selected_note" id="selected_note" value="">
+            <input type="file" name="audio" id="audioFile">
+        </form>
+    </div>
+    {% else %}
+    <div class="note-result">
+        <h2>노트 생성 완료</h2>
+        <h3>제목: {{ note.title }}</h3>
+        <div class="markdown-body">
+            {% if note.summary is string %}
+                {{ note.summary | markdown }}
+            {% else %}
+                <ul>
+                {% for item in note.summary %}
+                    <li>{{ item }}</li>
+                {% endfor %}
+                </ul>
+            {% endif %}
+        </div>
+        <div style="margin-top: 15px;">
+            <a href="{{ url_for('edit_doc', doc_id=note.title) }}" class="btn">노트 편집하기</a>
+        </div>
+    </div>
+    {% endif %}
+
+    <script>
+        let mediaRecorder;
+        let audioChunks = [];
+        let startTime;
+        let timerInterval;
+        
+        const recordButton = document.getElementById('recordButton');
+        const stopButton = document.getElementById('stopButton');
+        const recordingStatus = document.getElementById('recordingStatus');
+        const timer = document.getElementById('timer');
+        const audioPreview = document.getElementById('audioPreview');
+        const audioPlayback = document.getElementById('audioPlayback');
+        const submitButton = document.getElementById('submitButton');
+        const discardButton = document.getElementById('discardButton');
+        
+        // 노트 유형 선택 관련 요소
+        const newNoteRadio = document.getElementById('new-note');
+        const appendNoteRadio = document.getElementById('append-note');
+        const noteSelection = document.getElementById('note-selection');
+        const existingNotesSelect = document.getElementById('existing-notes');
+        const isNewInput = document.getElementById('is_new');
+        const selectedNoteInput = document.getElementById('selected_note');
+        
+        // 노트 유형 선택 이벤트 리스너
+        newNoteRadio.addEventListener('change', function() {
+            noteSelection.style.display = 'none';
+            isNewInput.value = 'y';
+        });
+        
+        appendNoteRadio.addEventListener('change', function() {
+            noteSelection.style.display = 'block';
+            isNewInput.value = 'n';
+            if (existingNotesSelect.options.length > 0) {
+                selectedNoteInput.value = existingNotesSelect.value;
+            }
+        });
+        
+        existingNotesSelect.addEventListener('change', function() {
+            selectedNoteInput.value = this.value;
+        });
+
+        recordButton.addEventListener('click', startRecording);
+        stopButton.addEventListener('click', stopRecording);
+        submitButton.addEventListener('click', submitAudio);
+        discardButton.addEventListener('click', discardRecording);
+
+        function startRecording() {
+            navigator.mediaDevices.getUserMedia({ audio: true })
+                .then(stream => {
+                    mediaRecorder = new MediaRecorder(stream);
+                    mediaRecorder.start();
+                    
+                    audioChunks = [];
+                    mediaRecorder.addEventListener("dataavailable", event => {
+                        audioChunks.push(event.data);
+                    });
+                    
+                    startTime = Date.now();
+                    updateTimer();
+                    timerInterval = setInterval(updateTimer, 1000);
+                    
+                    recordButton.disabled = true;
+                    stopButton.disabled = false;
+                    recordingStatus.textContent = "녹음 중...";
+                })
+                .catch(error => {
+                    console.error('마이크 접근 오류:', error);
+                    recordingStatus.textContent = "마이크 접근 오류: " + error.message;
+                });
+        }
+
+        function stopRecording() {
+            mediaRecorder.stop();
+            clearInterval(timerInterval);
+            
+            mediaRecorder.addEventListener("stop", () => {
+                const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+                const audioUrl = URL.createObjectURL(audioBlob);
+                audioPlayback.src = audioUrl;
+                
+                // 파일 객체 생성 및 폼에 추가
+                const file = new File([audioBlob], "recording.webm", { type: 'audio/webm' });
+                const dataTransfer = new DataTransfer();
+                dataTransfer.items.add(file);
+                document.getElementById('audioFile').files = dataTransfer.files;
+                
+                audioPreview.style.display = 'block';
+                recordButton.disabled = false;
+                stopButton.disabled = true;
+                recordingStatus.textContent = "녹음 완료";
+            });
+        }
+
+        function updateTimer() {
+            const elapsed = Math.floor((Date.now() - startTime) / 1000);
+            const minutes = Math.floor(elapsed / 60).toString().padStart(2, '0');
+            const seconds = (elapsed % 60).toString().padStart(2, '0');
+            timer.textContent = `${minutes}:${seconds}`;
+        }
+
+        function submitAudio() {
+            // 노트 유형에 따라 폼 데이터 설정
+            if (appendNoteRadio.checked) {
+                isNewInput.value = 'n';
+                selectedNoteInput.value = existingNotesSelect.value;
+            } else {
+                isNewInput.value = 'y';
+                selectedNoteInput.value = '';
+            }
+            
+            document.getElementById('audioForm').submit();
+        }
+
+        function discardRecording() {
+            audioPreview.style.display = 'none';
+            recordingStatus.textContent = "";
+            timer.textContent = "";
+        }
+    </script>
+</body>
+</html>
